@@ -71,6 +71,8 @@ class Graph:
     # Return True/False depending on success.
     def trySwap(self,i):
 
+        origPerm = self.perm.copy()
+
         orig = self.tourValue()
 
         self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
@@ -78,7 +80,7 @@ class Graph:
         new = self.tourValue()
 
         if orig < new:
-            self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
+            self.perm = origPerm
             return False
         else:
             return True
@@ -88,15 +90,26 @@ class Graph:
     # if it improves the tour value.
     # Return True/False depending on success.              
     def tryReverse(self,i,j):
-        origVal = self.tourValue()
 
+        origPerm = self.perm.copy()
 
-        newVal = self.tourValue()
+        orig = self.tourValue()
 
+        s1 = i
+        s2 = j
 
-        return newVal > origVal
+        while s1<s2:
+            self.perm[s1], self.perm[s2] = self.perm[s2], self.perm[s1]
+            s1 += 1
+            s2 -= 1
 
+        new = self.tourValue()
 
+        if orig < new:
+            self.perm = origPerm
+            return False
+        else:
+            return True
 
 
     def swapHeuristic(self):
@@ -127,4 +140,5 @@ class Graph:
 g = Graph(-1, "cities50")
 print(g.tourValue())
 g.swapHeuristic()
+g.TwoOptHeuristic()
 print(g.tourValue())
