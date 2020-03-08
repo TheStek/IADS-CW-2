@@ -12,23 +12,91 @@ class Graph:
     # the n>0 case, where we read a general graph in a different format.
     # self.perm, self.dists, self.n are the key variables to be set up.
     def __init__(self,n,filename):
+        with open(filename, 'r') as f:
+            lines = f.read().splitlines()
 
+        if n!= -1:
+            c1 = []
+            c2 = []
+            c3 = []
+            for l in lines:
+                data = self.stripVals(l)
+                c1.append(data[0])
+                c2.append(data[1])
+                c3.append(data[2])
+
+            nodes = set(c1).union(set(c2))
+            self.n = n
+
+            nodeReference = {node : i for (node, i) in zip(nodes, range(self.n))}
+
+            self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
+
+            for i in range(len(c1)):
+                n1 = c1[i]
+                n2 = c2[i]
+                d = c3[i]
+                self.dists[nodeReference[n1]][nodeReference[n2]] = int(d)
+
+
+        else:
+            self.n = len(lines)
+            self.dists = self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
+
+            for i in range(self.n):
+                for j in range(self.n):
+                    n1 = self.stripVals(lines[i])
+                    n2 = self.stripVals(lines[j])
+                    self.dists[i][j] = euclid(n1, n2)
+
+        self.perm = list(range(self.n))
+
+    def stripVals(self, line):
+        l = line.split(' ')
+        return list(map(float, filter(lambda x: x != '', l)))
 
     # Complete as described in the spec, to calculate the cost of the
     # current tour (as represented by self.perm).
     def tourValue(self):
+        val = 0
+        for i in range(self.n):
+            start = self.perm[i]
+            end = self.perm[(i+1) % self.n]
+            val += self.dists[start][end]
+        return val
+
 
     # Attempt the swap of cities i and i+1 in self.perm and commit
     # commit to the swap if it improves the cost of the tour.
     # Return True/False depending on success.
     def trySwap(self,i):
 
+        orig = self.tourValue()
+
+        self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
+
+        new = self.tourValue()
+
+        if orig < new:
+            self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
+            return False
+        else:
+            return True
 
     # Consider the effect of reversiing the segment between
     # self.perm[i] and self.perm[j], and commit to the reversal
     # if it improves the tour value.
     # Return True/False depending on success.              
     def tryReverse(self,i,j):
+        origVal = self.tourValue()
+
+
+        newVal = self.tourValue()
+
+
+        return newVal > origVal
+
+
 
 
     def swapHeuristic(self):
@@ -53,3 +121,10 @@ class Graph:
     # from node 0, taking the closest (unused) node as 'next'
     # each time.
     def Greedy(self):
+        pass
+
+
+g = Graph(-1, "cities50")
+print(g.tourValue())
+g.swapHeuristic()
+print(g.tourValue())
