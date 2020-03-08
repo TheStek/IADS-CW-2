@@ -134,11 +134,21 @@ class Graph:
     # from node 0, taking the closest (unused) node as 'next'
     # each time.
     def Greedy(self):
-        pass
+        perm = [0]
+        for i in range(self.n-1):
+            nodesToCheck = self.dists[i]
+            closest = 0
+            for j in range(self.n):
+                if not j in perm:
+                    if nodesToCheck[j] < nodesToCheck[closest]:
+                        closest = j
+            perm.append(closest)
+        print(perm)
+        self.perm = perm
+        print(self.n - len(perm))
 
 
 g = Graph(-1, "cities50")
 print(g.tourValue())
-g.swapHeuristic()
-g.TwoOptHeuristic()
+g.Greedy()
 print(g.tourValue())
