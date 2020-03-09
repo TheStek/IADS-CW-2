@@ -15,28 +15,39 @@ class Graph:
         with open(filename, 'r') as f:
             lines = f.read().splitlines()
 
-        if n!= -1:
-            c1 = []
-            c2 = []
-            c3 = []
-            for l in lines:
-                data = self.stripVals(l)
-                c1.append(data[0])
-                c2.append(data[1])
-                c3.append(data[2])
+        # if n!= -1:
+        #     c1 = []
+        #     c2 = []
+        #     c3 = []
+        #     for l in lines:
+        #         data = list(map(float, l.split()))
+        #         c1.append(data[0])
+        #         c2.append(data[1])
+        #         c3.append(data[2])
 
-            nodes = set(c1).union(set(c2))
+        #     nodes = set(c1).union(set(c2))
+        #     self.n = n
+
+        #     nodeReference = {node : i for (node, i) in zip(nodes, range(self.n))}
+
+        #     self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
+
+        #     for i in range(len(c1)):
+        #         n1 = c1[i]
+        #         n2 = c2[i]
+        #         d = c3[i]
+        #         self.dists[nodeReference[n1]][nodeReference[n2]] = int(d)
+
+
+        if n != -1:
             self.n = n
-
-            nodeReference = {node : i for (node, i) in zip(nodes, range(self.n))}
-
             self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
+            
+            for l in lines:
+                data = list(map(int, l.split()))
+                self.dists[data[0]][data[1]] = data[2]
+                self.dists[data[1]][data[0]] = data[2]
 
-            for i in range(len(c1)):
-                n1 = c1[i]
-                n2 = c2[i]
-                d = c3[i]
-                self.dists[nodeReference[n1]][nodeReference[n2]] = int(d)
 
 
         else:
@@ -45,15 +56,14 @@ class Graph:
 
             for i in range(self.n):
                 for j in range(self.n):
-                    n1 = self.stripVals(lines[i])
-                    n2 = self.stripVals(lines[j])
+                    n1 = list(map(float, lines[i].split()))
+                    
+                    n2 = list(map(float, lines[j].split()))
+          
                     self.dists[i][j] = euclid(n1, n2)
 
         self.perm = list(range(self.n))
 
-    def stripVals(self, line):
-        l = line.split(' ')
-        return list(map(float, filter(lambda x: x != '', l)))
 
     # Complete as described in the spec, to calculate the cost of the
     # current tour (as represented by self.perm).
@@ -95,13 +105,7 @@ class Graph:
 
         orig = self.tourValue()
 
-        s1 = i
-        s2 = j
-
-        while s1<s2:
-            self.perm[s1], self.perm[s2] = self.perm[s2], self.perm[s1]
-            s1 += 1
-            s2 -= 1
+        self.perm[i:j+1] = reversed(self.perm[i:j+1])
 
         new = self.tourValue()
 
@@ -110,6 +114,7 @@ class Graph:
             return False
         else:
             return True
+
 
 
     def swapHeuristic(self):
@@ -124,7 +129,7 @@ class Graph:
         better = True
         while better:
             better = False
-            for j in range(self.n-1):
+            for j in range(self.n):
                 for i in range(j):
                     if self.tryReverse(i,j):
                         better = True
@@ -134,19 +139,24 @@ class Graph:
     # from node 0, taking the closest (unused) node as 'next'
     # each time.
     def Greedy(self):
-        perm = [0]
+        perm = [self.perm[0]]
+        
         for i in range(self.n-1):
-            nodesToCheck = self.dists[i]
-            closest = 0
+            nodesToCheck = self.dists[perm[i]]
+
+            for c in range(self.n):
+                if not c in perm:
+                    closest = c
+                    break
+
+                    
             for j in range(self.n):
                 if not j in perm:
                     if nodesToCheck[j] < nodesToCheck[closest]:
                         closest = j
             perm.append(closest)
-        print(perm)
+        
         self.perm = perm
-        print(self.n - len(perm))
-
 
 g = Graph(-1, "cities50")
 print(g.tourValue())
