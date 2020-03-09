@@ -15,30 +15,6 @@ class Graph:
         with open(filename, 'r') as f:
             lines = f.read().splitlines()
 
-        # if n!= -1:
-        #     c1 = []
-        #     c2 = []
-        #     c3 = []
-        #     for l in lines:
-        #         data = list(map(float, l.split()))
-        #         c1.append(data[0])
-        #         c2.append(data[1])
-        #         c3.append(data[2])
-
-        #     nodes = set(c1).union(set(c2))
-        #     self.n = n
-
-        #     nodeReference = {node : i for (node, i) in zip(nodes, range(self.n))}
-
-        #     self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
-
-        #     for i in range(len(c1)):
-        #         n1 = c1[i]
-        #         n2 = c2[i]
-        #         d = c3[i]
-        #         self.dists[nodeReference[n1]][nodeReference[n2]] = int(d)
-
-
         if n != -1:
             self.n = n
             self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
@@ -109,11 +85,11 @@ class Graph:
 
         new = self.tourValue()
 
-        if orig < new:
+        if new < orig:
+            return True
+        else:
             self.perm = origPerm
             return False
-        else:
-            return True
 
 
 
@@ -129,7 +105,7 @@ class Graph:
         better = True
         while better:
             better = False
-            for j in range(self.n):
+            for j in range(self.n-1):
                 for i in range(j):
                     if self.tryReverse(i,j):
                         better = True
@@ -140,25 +116,46 @@ class Graph:
     # each time.
     def Greedy(self):
         perm = [self.perm[0]]
+        unvisited = self.perm[1:]
         
         for i in range(self.n-1):
-            nodesToCheck = self.dists[perm[i]]
-
-            for c in range(self.n):
-                if not c in perm:
-                    closest = c
-                    break
-
-                    
-            for j in range(self.n):
-                if not j in perm:
-                    if nodesToCheck[j] < nodesToCheck[closest]:
-                        closest = j
-            perm.append(closest)
+            costs = list(zip(unvisited, [self.dists[perm[i]][x] for x in unvisited]))
+            costs.sort(key = lambda x: x[1])
+            perm.append(costs[0][0])
+            unvisited.remove(costs[0][0])
         
         self.perm = perm
 
+
+
+    # Doesn't work cause the traversals wrap around anyway
+
+    def changeStart(self, i):
+
+        origPerm = self.perm.copy()
+
+        orig = self.tourValue()
+
+        for j in range(i):
+            self.perm = self.perm[1:] + [self.perm[0]]
+
+
+        new = self.tourValue()
+
+        if orig < new:
+            self.perm = origPerm
+            return False
+        else:
+            return True
+
+
+    def changeStartHeuristic(self):
+        better = True
+        while better:
+            for i in range(1, self.n):
+                better = self.changeStart(i)
+
 g = Graph(-1, "cities50")
 print(g.tourValue())
-g.Greedy()
+g.changeStartHeuristic()
 print(g.tourValue())
