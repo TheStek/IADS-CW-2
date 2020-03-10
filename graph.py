@@ -1,4 +1,5 @@
 import math
+import time
 
 def euclid(p,q):
     x = p[0]-q[0]
@@ -56,15 +57,11 @@ class Graph:
     # commit to the swap if it improves the cost of the tour.
     # Return True/False depending on success.
     def trySwap(self,i):
-
         origPerm = self.perm.copy()
-
         orig = self.tourValue()
-
         self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
-
         new = self.tourValue()
-
+        
         if orig < new:
             self.perm = origPerm
             return False
@@ -76,20 +73,11 @@ class Graph:
     # if it improves the tour value.
     # Return True/False depending on success.              
     def tryReverse(self,i,j):
-
-        origPerm = self.perm.copy()
-
-        orig = self.tourValue()
-
-        self.perm[i:j+1] = reversed(self.perm[i:j+1])
-
-        new = self.tourValue()
-
-        if new < orig:
+        if ((self.dists[self.perm[i-1]][self.perm[i]] + self.dists[self.perm[j]][self.perm[j+1]]) > 
+                (self.dists[self.perm[i-1]][self.perm[j]] + self.dists[self.perm[i]][self.perm[j+1]])):
+            self.perm[i:j+1] = reversed(self.perm[i:j+1])
             return True
-        else:
-            self.perm = origPerm
-            return False
+        return False
 
 
 
@@ -128,34 +116,9 @@ class Graph:
 
 
 
-    # Doesn't work cause the traversals wrap around anyway
-
-    def changeStart(self, i):
-
-        origPerm = self.perm.copy()
-
-        orig = self.tourValue()
-
-        for j in range(i):
-            self.perm = self.perm[1:] + [self.perm[0]]
-
-
-        new = self.tourValue()
-
-        if orig < new:
-            self.perm = origPerm
-            return False
-        else:
-            return True
-
-
-    def changeStartHeuristic(self):
-        better = True
-        while better:
-            for i in range(1, self.n):
-                better = self.changeStart(i)
-
 g = Graph(-1, "cities50")
 print(g.tourValue())
-g.changeStartHeuristic()
+g.swapHeuristic()
+start = time.time()
+g.Greedy()
 print(g.tourValue())
