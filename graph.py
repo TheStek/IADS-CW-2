@@ -116,9 +116,69 @@ class Graph:
 
 
 
+
+    def bestConnectionTourBuilder(self, threshhold=100):
+        visited = []
+        unvisited = list(range(self.n))
+
+        while len(unvisited) > 0:
+            # connectednessMap = [(sum([self.dists[i][j] for j in unvisited if i !=j]), i) for i in unvisited]
+
+            connectednessMap = []
+
+            for i in unvisited:
+                distances = []
+                belowThreshhold = 1
+                for j in unvisited:
+                    if j != i:
+                        distances.append(self.dists[i][j])
+                        if self.dists[i][j] < threshhold:
+                            belowThreshhold += 1
+
+                connectednessMap.append((sum(distances)/belowThreshhold, i))
+
+            nextNode = sorted(connectednessMap, key=lambda x: x[0])[0][1]
+            visited.append(nextNode)
+            unvisited.remove(nextNode)
+
+        self.perm = visited
+        
+
+    def BestConnectionHeuristic(self, n = 100):
+        maxDist = max(map(max, self.dists))
+        minDist = min(map(min, self.dists))
+
+        t = minDist
+        step = (maxDist - minDist)/n
+
+        best = 1000000000
+        bestThreshhold = t
+
+
+        for i in range(n):
+            t += step
+            self.bestConnectionTourBuilder()
+            new = self.tourValue()
+
+            if new < best:
+                best = new
+                bestThreshhold = t
+
+        print(bestThreshhold)
+        self.bestConnectionTourBuilder(bestThreshhold)
+
+        
+
+
+
+
+
 g = Graph(-1, "cities50")
 print(g.tourValue())
-g.swapHeuristic()
-start = time.time()
-g.Greedy()
+
+
+g.bestConnectionTourBuilder()
+print(g.tourValue())
+
+g.BestConnectionHeuristic()
 print(g.tourValue())

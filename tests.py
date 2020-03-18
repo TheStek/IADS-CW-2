@@ -18,7 +18,3 @@ def generateRandomMetricGraph(n):
                 if j>i:
                     f.write(f"{i} {j} {random.randrange(25)}\n")
 
-
-generateRandomEuclidianGraph(10, 50)
-
-generateRandomMetricGraph(6)
