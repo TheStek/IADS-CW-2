@@ -18,3 +18,10 @@ def generateRandomMetricGraph(n):
                 if j>i:
                     f.write(f"{i} {j} {random.randrange(25)}\n")
 
+
+
+
+
+x = [1, 2, 3]
+
+x.remove(4)

@@ -116,69 +116,50 @@ class Graph:
 
 
 
+    def shortestArcs(self):
 
-    def bestConnectionTourBuilder(self, threshhold=100):
         visited = []
         unvisited = list(range(self.n))
 
-        while len(unvisited) > 0:
-            # connectednessMap = [(sum([self.dists[i][j] for j in unvisited if i !=j]), i) for i in unvisited]
+        arcsToUse = []
 
-            connectednessMap = []
+        while len(unvisited) > 1:
+            arcs = [(self.dists[i][j], i, j) for i in unvisited for j in unvisited if i != j]
+            (d, a, b) = min(arcs, key = lambda x: x[0])
+            arcs = arcs[1:]
+            if a in unvisited and b in unvisited:
+                arcsToUse.append((a, b))
+                unvisited.remove(a)
+                unvisited.remove(b)
 
-            for i in unvisited:
-                distances = []
-                belowThreshhold = 1
-                for j in unvisited:
-                    if j != i:
-                        distances.append(self.dists[i][j])
-                        if self.dists[i][j] < threshhold:
-                            belowThreshhold += 1
 
-                connectednessMap.append((sum(distances)/belowThreshhold, i))
 
-            nextNode = sorted(connectednessMap, key=lambda x: x[0])[0][1]
-            visited.append(nextNode)
-            unvisited.remove(nextNode)
+        visited.append(arcsToUse[0][0])
+        visited.append(arcsToUse[0][1])
+
+        while len(visited) < self.n-len(unvisited):
+            last = visited[-1]
+
+            arcsToUse = list(filter(lambda x: not (x[0] in visited or x[1] in visited), arcsToUse))
+
+            arcPosition = [(self.dists[last][a], a, b) for (a, b) in arcsToUse] + [(self.dists[last][b], b, a) for (a, b) in arcsToUse]
+            (d, x, y) = min(arcPosition, key = lambda x: x[0])
+            visited.append(x)
+            visited.append(y)
+
+        if len(unvisited) == 1:
+            visited.append(unvisited[-1])
+
+
 
         self.perm = visited
-        
-
-    def BestConnectionHeuristic(self, n = 100):
-        maxDist = max(map(max, self.dists))
-        minDist = min(map(min, self.dists))
-
-        t = minDist
-        step = (maxDist - minDist)/n
-
-        best = 1000000000
-        bestThreshhold = t
-
-
-        for i in range(n):
-            t += step
-            self.bestConnectionTourBuilder()
-            new = self.tourValue()
-
-            if new < best:
-                best = new
-                bestThreshhold = t
-
-        print(bestThreshhold)
-        self.bestConnectionTourBuilder(bestThreshhold)
-
-        
 
 
 
 
+g = Graph(-1, "cities75")
+print(f"Original tour cost - {g.tourValue()}")
 
-g = Graph(-1, "cities50")
-print(g.tourValue())
 
-
-g.bestConnectionTourBuilder()
-print(g.tourValue())
-
-g.BestConnectionHeuristic()
-print(g.tourValue())
+g.shortestArcs()
+print(f"Cost after shortestArcs heuristic - {g.tourValue()}")
