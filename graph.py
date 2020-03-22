@@ -159,37 +159,54 @@ class Graph:
 
 
     def shortestArcs(self):
+        # Initalise the empty visited list, the empty list of arcs to use and the unvisited list to all nodes
         visited = []
         unvisited = list(range(self.n))
-
         arcsToUse = []
 
+        # Generate the list of all arcs in the graph, storing cost and both nodes
         arcs = [(self.dists[i][j], i, j) for i in unvisited for j in unvisited if i != j]
 
+        # Loop while there are arcs to add
         while len(unvisited) > 1:
+
+            # Remove all arcs that aren't for nodes in the unvisited list
             arcs = list(filter(lambda x: (x[1] in unvisited) and (x[2] in unvisited), arcs))
 
+            # Find the shortest arc in the arcs list, add to arcs to use and remove nodes from unvisited
             (d, a, b) = min(arcs, key = lambda x: x[0])
 
-            if a in unvisited and b in unvisited:
-                arcsToUse.append((a, b))
-                unvisited.remove(a)
-                unvisited.remove(b)
+            arcsToUse.append((a, b))
+            unvisited.remove(a)
+            unvisited.remove(b)
 
+
+
+        # Add the first arc to the visited list
         visited.append(arcsToUse[0][0])
         visited.append(arcsToUse[0][1])
 
+        # Loop to build up the visited list
         while len(visited) < self.n-len(unvisited):
+
+            # Store the last node in the tour
             last = visited[-1]
 
+            # Filter out arcs we have used already
             arcsToUse = list(filter(lambda x: not (x[0] in visited or x[1] in visited), arcsToUse))
 
+            # Generate a list storing the distances from each arc to the last node and the nodes in each arc
+            # This is done for the reverse of each arc as well
             arcPosition = [(self.dists[last][a], a, b) for (a, b) in arcsToUse] + [(self.dists[last][b], b, a) for (a, b) in arcsToUse]
+            
+            # Find the closest of these arcs and add it to the visited list
             (d, x, y) = min(arcPosition, key = lambda x: x[0])
             visited.append(x)
             visited.append(y)
 
+        # Add any leftover to the end of the visited list
         if len(unvisited) == 1:
             visited.append(unvisited[-1])
 
+        # Set the perm to the visited list
         self.perm = visited

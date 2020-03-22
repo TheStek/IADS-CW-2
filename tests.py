@@ -44,12 +44,15 @@ def shortestArcEuclidianTest(n, size=1000, runs=10, output = True):
 
     return av
 
-x = [shortestArcEuclidianTest(i, output = False) for i in range(5, 120, 5)]
+# x = [shortestArcEuclidianTest(i, output = False) for i in range(5, 120, 5)]
 
-plt.plot(range(5, 120, 5), x)
+# plt.plot(range(5, 120, 5), x)
 
-plt.xlabel("n")
-plt.ylabel("Average Percentage Reduction in Cost")
+# plt.xlabel("n")
+# plt.ylabel("Average Percentage Reduction in Cost")
 
 
-plt.show()
+# plt.show()
+
+
+shortestArcEuclidianTest(100)
