@@ -123,15 +123,18 @@ class Graph:
 
         arcsToUse = []
 
+
+        arcs = [(self.dists[i][j], i, j) for i in unvisited for j in unvisited if i != j]
+
         while len(unvisited) > 1:
-            arcs = [(self.dists[i][j], i, j) for i in unvisited for j in unvisited if i != j]
+            arcs = list(filter(lambda x: (x[1] in unvisited) and (x[2] in unvisited), arcs))
+
             (d, a, b) = min(arcs, key = lambda x: x[0])
-            arcs = arcs[1:]
+
             if a in unvisited and b in unvisited:
                 arcsToUse.append((a, b))
                 unvisited.remove(a)
                 unvisited.remove(b)
-
 
 
         visited.append(arcsToUse[0][0])
@@ -149,9 +152,7 @@ class Graph:
 
         if len(unvisited) == 1:
             visited.append(unvisited[-1])
-
-
-
+            
         self.perm = visited
 
 
