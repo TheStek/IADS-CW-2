@@ -122,7 +122,6 @@ class Graph:
 
         arcsToUse = []
 
-
         arcs = [(self.dists[i][j], i, j) for i in unvisited for j in unvisited if i != j]
 
         while len(unvisited) > 1:
@@ -134,7 +133,6 @@ class Graph:
                 arcsToUse.append((a, b))
                 unvisited.remove(a)
                 unvisited.remove(b)
-
 
         visited.append(arcsToUse[0][0])
         visited.append(arcsToUse[0][1])
