@@ -152,12 +152,3 @@ class Graph:
 
         self.perm = visited
 
-
-
-
-g = Graph(-1, "cities75")
-print(f"Original tour cost - {g.tourValue()}")
-
-
-g.shortestArcs()
-print(f"Cost after shortestArcs heuristic - {g.tourValue()}")
