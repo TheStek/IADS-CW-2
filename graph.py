@@ -117,7 +117,6 @@ class Graph:
 
 
     def shortestArcs(self):
-
         visited = []
         unvisited = list(range(self.n))
 
@@ -152,7 +151,7 @@ class Graph:
 
         if len(unvisited) == 1:
             visited.append(unvisited[-1])
-            
+
         self.perm = visited
 
 
