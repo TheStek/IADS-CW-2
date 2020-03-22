@@ -13,9 +13,15 @@ class Graph:
     # the n>0 case, where we read a general graph in a different format.
     # self.perm, self.dists, self.n are the key variables to be set up.
     def __init__(self,n,filename):
+
+        # Open the file and save the lines in a list
+
         with open(filename, 'r') as f:
             lines = f.read().splitlines()
 
+
+        # If the graph is metric initialise the dists matrix and loop through data adding the costs into the 
+        # correct element
         if n != -1:
             self.n = n
             self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
@@ -27,9 +33,15 @@ class Graph:
 
 
 
+
+        # If the graph is euclidian find n as the number of coordinate pairs in the file and initialise the dists matrix
+
         else:
             self.n = len(lines)
             self.dists = self.dists = [[10000000 for i in range(self.n)] for i in range(self.n)]
+
+
+            # Loop through each pair of locations and add the corresponding distances to the correct element of dists
 
             for i in range(self.n):
                 for j in range(self.n):
@@ -39,12 +51,18 @@ class Graph:
           
                     self.dists[i][j] = euclid(n1, n2)
 
+
+
+        # Set the intial permutation to the nodes in order
         self.perm = list(range(self.n))
 
 
     # Complete as described in the spec, to calculate the cost of the
     # current tour (as represented by self.perm).
     def tourValue(self):
+
+        # Loop through each of the nodes in self.perm and add the cost from this to the next value to val
+
         val = 0
         for i in range(self.n):
             start = self.perm[i]
@@ -57,11 +75,17 @@ class Graph:
     # commit to the swap if it improves the cost of the tour.
     # Return True/False depending on success.
     def trySwap(self,i):
+
+        # Save the original perm and the tour value of this
         origPerm = self.perm.copy()
         orig = self.tourValue()
+
+        # Swap the two specified elements and get the new tour value
         self.perm[i], self.perm[(i+1) % self.n] = self.perm[(i+1) % self.n], self.perm[i]
         new = self.tourValue()
         
+
+        # If there is no improvement revert to the original
         if orig < new:
             self.perm = origPerm
             return False
@@ -73,9 +97,16 @@ class Graph:
     # if it improves the tour value.
     # Return True/False depending on success.              
     def tryReverse(self,i,j):
+        # The only change in the tour value will be at the edges of the portion to reverse
+        # This if statement checks if a reverse would be beneficial
+
         if ((self.dists[self.perm[i-1]][self.perm[i]] + self.dists[self.perm[j]][self.perm[j+1]]) > 
                 (self.dists[self.perm[i-1]][self.perm[j]] + self.dists[self.perm[i]][self.perm[j+1]])):
+            
+            # If the reverse would be beneficial, reverse the specified section
             self.perm[i:j+1] = reversed(self.perm[i:j+1])
+
+
             return True
         return False
 
@@ -103,15 +134,26 @@ class Graph:
     # from node 0, taking the closest (unused) node as 'next'
     # each time.
     def Greedy(self):
+        # Add the first element of the initial perm to the new perm list
+        # Add all other nodes to the unvisited list
+
         perm = [self.perm[0]]
         unvisited = self.perm[1:]
         
+        # Loop through the perm and add the closest node to the last node in perm
         for i in range(self.n-1):
-            costs = list(zip(unvisited, [self.dists[perm[i]][x] for x in unvisited]))
-            costs.sort(key = lambda x: x[1])
-            perm.append(costs[0][0])
-            unvisited.remove(costs[0][0])
+
+            # Generate a list of unvisited nodes paired with the distance from the last node in perm
+            costs = [(x, self.dists[perm[i]][x]) for x in unvisited]
+
+            # Find the node with the smallest distance
+            (minNode, d) = min(costs, key=lambda x: x[1])
+
+            # Add the node to the perm and remove it from the unvisited list
+            perm.append(minNode)
+            unvisited.remove(minNode)
         
+        # Set the perm attribute to the perm we built
         self.perm = perm
 
 
@@ -151,4 +193,3 @@ class Graph:
             visited.append(unvisited[-1])
 
         self.perm = visited
-

@@ -22,7 +22,6 @@ def generateRandomMetricGraph(n):
 
 
 def shortestArcEuclidianTest(n, size=1000, runs=10, output = True):
-
     av = 0
 
     print(f"Running tests using n={n}, size={size} with {runs} graphs\n")
