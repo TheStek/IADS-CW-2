@@ -150,11 +150,14 @@ shortestArcTest(100, runs=20, mode="runtime")
 shortestArcEuclideanTest(100, runs=20)
 shortestArcEuclideanTest(100, runs=20, mode="runtime")
 
+# Graphs plotted in a try except clause due to issues with display on DICE
+try:
+    plotRandomGraph(5, 120, 5)
+    plotEuclideanGraph(5, 120, 5)
 
-plotRandomGraph(5, 120, 5)
-plotEuclideanGraph(5, 120, 5)
 
+    plotRandomGraph(5, 120, 5, mode="runtime")
+    plotEuclideanGraph(5, 120, 5, mode="runtime")
 
-plotRandomGraph(5, 120, 5, mode="runtime")
-plotEuclideanGraph(5, 120, 5, mode="runtime")
-
+except:
+    pass
